@@ -1,0 +1,45 @@
+EduOnline/
+├── app.py                      # create_app(), регистрация blueprints, запуск
+├── config.py                   # SECRET_KEY, DB_PATH, UPLOAD_FOLDER
+├── requirements.txt
+│
+├── database/
+│   ├── eduonline.db
+│   ├── schema.sql              # CREATE TABLE ... — для пересоздания БД одной командой
+│   └── db.py                   # get_db(), close_db(), функции-обёртки над SQL
+│
+├── blueprints/             
+│   ├── __init__.py
+│   ├── auth.py                 # /register, /login, /2fa/setup, /2fa/verify, /logout
+│   ├── courses.py              # /courses, /courses/<id>, /courses/new, /lessons/...
+│   ├── tasks.py                # /tasks/<id>, /tasks/<id>/submit, /submissions/<id>/grade
+│   ├── files.py                # /files/upload, /files/<id>/download
+│   └── stats.py                # /leaderboard, /reports/csv, /reports/pdf
+│
+├── services/                   # бизнес-логика отдельно от роутов
+│   ├── auth_service.py         # хеш паролей, pyotp.TOTP, генерация QR
+│   ├── grading_service.py      # автопроверка тестов, подсчёт баллов
+│   └── report_service.py       # pandas → xlsx/csv, pdfkit → pdf
+│
+├── utils/
+│   └── decorators.py           # @login_required, @role_required('teacher')
+│
+├── templates/                  # Jinja2, Flask найдёт автоматически
+│   ├── base.html               # каркас с Bootstrap, тумблер «слабовидящие»
+│   ├── auth/
+│   │   ├── login.html
+│   │   ├── register.html
+│   │   └── 2fa.html
+│   ├── courses/
+│   ├── tasks/
+│   └── stats/
+│       └── leaderboard.html
+│
+├── static/                     # Flask отдаёт автоматически по /static/...
+│   ├── css/
+│   │   ├── main.css
+│   │   └── accessibility.css   # высокий контраст, крупные шрифты
+│   └── js/
+│       └── accessibility.js    # переключатель режима, сохраняет в localStorage
+│
+└── uploads/                    # пользовательские файлы — НЕ в static/!
