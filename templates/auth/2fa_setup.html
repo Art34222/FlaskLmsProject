@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Настройка 2FA — EduOnline{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2 class="mb-4">Настройка двухфакторной аутентификации</h2>
+        <p>Отсканируйте QR-код в приложении Google Authenticator (или аналогичном),
+           затем введите 6-значный код для подтверждения.</p>
+
+        <div class="text-center mb-3">
+            <img src="{{ qr }}" alt="QR-код для 2FA" style="max-width: 250px;">
+        </div>
+
+        <p class="text-muted text-center small">
+            Или введите ключ вручную: <code>{{ secret }}</code>
+        </p>
+
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">Код из приложения</label>
+                <input type="text" name="code" class="form-control" maxlength="6"
+                       pattern="\d{6}" required placeholder="000000">
+            </div>
+            <button class="btn btn-primary w-100">Подтвердить и включить 2FA</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

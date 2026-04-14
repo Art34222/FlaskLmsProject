@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{{ task.title }} — EduOnline{% endblock %}
+{% block content %}
+<a href="{{ url_for('courses.course_detail', course_id=lesson.course_id) }}"
+   class="btn btn-outline-secondary btn-sm mb-3">← Назад к курсу</a>
+
+<h2>{{ task.title }}</h2>
+<span class="badge bg-{{ 'info' if task.task_type == 'test' else 'warning' }} mb-3">
+    {{ 'Тест' if task.task_type == 'test' else 'Развёрнутый ответ' }}
+</span>
+<span class="badge bg-secondary mb-3">Макс. баллов: {{ task.max_score }}</span>
+
+{% if task.description %}
+<p class="mt-2">{{ task.description }}</p>
+{% endif %}
+
+{# Предыдущий ответ #}
+{% if submission %}
+<div class="alert alert-{{ 'success' if submission.score is not none else 'secondary' }} mt-3">
+    <strong>Ваш ответ:</strong> {{ submission.answer or '(файл)' }}<br>
+    {% if submission.score is not none %}
+        <strong>Оценка:</strong> {{ submission.score }} / {{ task.max_score }}
+    {% else %}
+        <em>Ожидает проверки</em>
+    {% endif %}
+</div>
+{% endif %}
+
+{# Форма ответа (для студентов) #}
+{% if session.get('role') == 'student' %}
+<div class="card mt-4">
+    <div class="card-body">
+        <h5 class="card-title">Ваш ответ</h5>
+
+        {% if task.task_type == 'test' and options %}
+        <form method="POST" action="{{ url_for('tasks.submit_answer', task_id=task.id) }}">
+            {% for opt in options %}
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="answer"
+                       value="{{ opt.label }}" id="opt{{ opt.id }}" required>
+                <label class="form-check-label" for="opt{{ opt.id }}">{{ opt.label }}</label>
+            </div>
+            {% endfor %}
+            <button class="btn btn-primary mt-2">Отправить ответ</button>
+        </form>
+
+        {% elif task.task_type == 'open' %}
+        <form method="POST" action="{{ url_for('tasks.submit_answer', task_id=task.id) }}">
+            <div class="mb-3">
+                <textarea name="answer" class="form-control" rows="4"
+                          placeholder="Напишите ваш ответ..." required></textarea>
+            </div>
+            <button class="btn btn-primary">Отправить ответ</button>
+        </form>
+
+        <hr>
+        <p class="text-muted small">Или загрузите файл с решением:</p>
+        <form method="POST" enctype="multipart/form-data"
+              action="{{ url_for('files.upload_submission_file', task_id=task.id) }}">
+            <div class="d-flex gap-2">
+                <input type="file" name="file" class="form-control form-control-sm" required>
+                <button class="btn btn-outline-primary btn-sm">Загрузить</button>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

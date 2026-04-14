@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Новый урок — EduOnline{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2 class="mb-4">Добавить урок в «{{ course.title }}»</h2>
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">Название урока</label>
+                <input type="text" name="title" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Содержание</label>
+                <textarea name="content" class="form-control" rows="6"
+                          placeholder="Текст лекции, пояснения…"></textarea>
+            </div>
+            <button class="btn btn-success">Добавить</button>
+            <a href="{{ url_for('courses.course_detail', course_id=course.id) }}"
+               class="btn btn-secondary ms-2">Отмена</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

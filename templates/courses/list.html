@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Курсы — EduOnline{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Мои курсы</h2>
+    {% if session.get('role') in ('teacher', 'admin') %}
+    <a href="{{ url_for('courses.create_course') }}" class="btn btn-success">+ Новый курс</a>
+    {% endif %}
+</div>
+
+{% if courses %}
+<div class="row">
+    {% for c in courses %}
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ c.title }}</h5>
+                <p class="card-text text-muted">{{ c.description or 'Без описания' }}</p>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('courses.course_detail', course_id=c.id) }}"
+                   class="btn btn-primary btn-sm">Открыть</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-muted">
+    {% if session.get('role') == 'student' %}
+        Вы пока не записаны ни на один курс. Выберите курс ниже.
+    {% else %}
+        У вас пока нет курсов. Создайте первый!
+    {% endif %}
+</p>
+{% endif %}
+
+{# Для студентов: все доступные курсы для записи #}
+{% if session.get('role') == 'student' and all_courses %}
+<hr>
+<h4 class="mb-3">Все доступные курсы</h4>
+<div class="row">
+    {% for c in all_courses %}
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ c.title }}</h5>
+                <p class="card-text text-muted">{{ c.description or 'Без описания' }}</p>
+            </div>
+            <div class="card-footer">
+                <form method="POST" action="{{ url_for('courses.enroll', course_id=c.id) }}" class="d-inline">
+                    <button class="btn btn-outline-primary btn-sm">Записаться</button>
+                </form>
+                <a href="{{ url_for('courses.course_detail', course_id=c.id) }}"
+                   class="btn btn-sm btn-link">Подробнее</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

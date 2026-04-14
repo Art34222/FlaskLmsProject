@@ -1,0 +1,19 @@
+// Версия для слабовидящих — переключатель
+document.addEventListener('DOMContentLoaded', () => {
+    const KEY = 'eduonline_a11y';
+    const body = document.body;
+    const btn = document.getElementById('a11y-toggle');
+
+    // Восстанавливаем состояние из localStorage
+    if (localStorage.getItem(KEY) === '1') {
+        body.classList.add('a11y');
+    }
+
+    if (btn) {
+        btn.addEventListener('click', () => {
+            body.classList.toggle('a11y');
+            const isOn = body.classList.contains('a11y');
+            localStorage.setItem(KEY, isOn ? '1' : '0');
+        });
+    }
+});

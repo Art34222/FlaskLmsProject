@@ -1,0 +1,98 @@
+/* Версия для слабовидящих — активируется классом .a11y на <body> */
+
+body.a11y {
+    background-color: #000 !important;
+    color: #fff !important;
+    font-size: 1.3rem !important;
+    line-height: 1.8 !important;
+}
+
+body.a11y .navbar {
+    background-color: #000 !important;
+    border-bottom: 3px solid #ff0 !important;
+}
+
+body.a11y .navbar-brand,
+body.a11y .nav-link,
+body.a11y .nav-link.text-light {
+    color: #ff0 !important;
+    font-size: 1.3rem !important;
+}
+
+body.a11y .card {
+    background-color: #1a1a1a !important;
+    color: #fff !important;
+    border: 2px solid #ff0 !important;
+}
+
+body.a11y .card-footer {
+    background-color: #111 !important;
+    border-top: 1px solid #ff0 !important;
+}
+
+body.a11y .btn-primary,
+body.a11y .btn-success {
+    background-color: #ff0 !important;
+    color: #000 !important;
+    border-color: #ff0 !important;
+    font-weight: 700 !important;
+}
+
+body.a11y .form-control,
+body.a11y .form-select {
+    background-color: #1a1a1a !important;
+    color: #fff !important;
+    border: 2px solid #ff0 !important;
+    font-size: 1.2rem !important;
+}
+
+body.a11y .form-label {
+    color: #ff0 !important;
+    font-weight: 700 !important;
+}
+
+body.a11y .table {
+    color: #fff !important;
+}
+
+body.a11y .table-dark th {
+    background-color: #333 !important;
+    color: #ff0 !important;
+}
+
+body.a11y .table tbody tr td {
+    background-color: #1a1a1a !important;
+    border-color: #555 !important;
+}
+
+body.a11y .alert {
+    border: 2px solid #ff0 !important;
+    font-size: 1.1rem !important;
+}
+
+body.a11y .accordion-button {
+    background-color: #1a1a1a !important;
+    color: #ff0 !important;
+    border: 1px solid #555 !important;
+    font-size: 1.2rem !important;
+}
+
+body.a11y .accordion-body {
+    background-color: #111 !important;
+    color: #fff !important;
+}
+
+body.a11y a {
+    color: #5cf !important;
+    text-decoration: underline !important;
+}
+
+body.a11y #a11y-toggle {
+    background-color: #ff0 !important;
+    color: #000 !important;
+    border-color: #ff0 !important;
+}
+
+body.a11y .text-muted {
+    color: #ccc !important;
+}

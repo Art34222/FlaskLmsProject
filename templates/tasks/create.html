@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Новое задание — EduOnline{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <h2 class="mb-4">Создать задание к уроку «{{ lesson.title }}»</h2>
+        <form method="POST" id="taskForm">
+            <div class="mb-3">
+                <label class="form-label">Название</label>
+                <input type="text" name="title" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Описание / вопрос</label>
+                <textarea name="description" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Тип задания</label>
+                <select name="task_type" id="taskType" class="form-select">
+                    <option value="test">Тест (автопроверка)</option>
+                    <option value="open">Развёрнутый ответ (ручная проверка)</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Макс. баллов</label>
+                <input type="number" name="max_score" class="form-control" value="10" min="1">
+            </div>
+
+            {# Блок для тестовых вариантов #}
+            <div id="testOptions">
+                <h5>Варианты ответов</h5>
+                <p class="text-muted small">Отметьте правильный(е) вариант(ы).</p>
+                <div id="optionsContainer">
+                    <div class="input-group mb-2">
+                        <div class="input-group-text">
+                            <input type="checkbox" name="correct_options" value="0">
+                        </div>
+                        <input type="text" name="options" class="form-control" placeholder="Вариант 1">
+                    </div>
+                    <div class="input-group mb-2">
+                        <div class="input-group-text">
+                            <input type="checkbox" name="correct_options" value="1">
+                        </div>
+                        <input type="text" name="options" class="form-control" placeholder="Вариант 2">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-secondary btn-sm mb-3" id="addOption">
+                    + Добавить вариант
+                </button>
+            </div>
+
+            {# Для open-заданий: скрытое поле для правильного ответа (опционально) #}
+            <div id="openAnswer" style="display: none;">
+                <div class="mb-3">
+                    <label class="form-label">Эталонный ответ (необязательно, для справки)</label>
+                    <textarea name="correct_answer" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+
+            <button class="btn btn-success">Создать задание</button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const typeSelect = document.getElementById('taskType');
+    const testBlock = document.getElementById('testOptions');
+    const openBlock = document.getElementById('openAnswer');
+    const container = document.getElementById('optionsContainer');
+    const addBtn = document.getElementById('addOption');
+    let optCount = 2;
+
+    typeSelect.addEventListener('change', () => {
+        const isTest = typeSelect.value === 'test';
+        testBlock.style.display = isTest ? '' : 'none';
+        openBlock.style.display = isTest ? 'none' : '';
+    });
+
+    addBtn.addEventListener('click', () => {
+        const div = document.createElement('div');
+        div.className = 'input-group mb-2';
+        div.innerHTML = `
+            <div class="input-group-text">
+                <input type="checkbox" name="correct_options" value="${optCount}">
+            </div>
+            <input type="text" name="options" class="form-control" placeholder="Вариант ${optCount + 1}">
+        `;
+        container.appendChild(div);
+        optCount++;
+    });
+});
+</script>
+{% endblock %}

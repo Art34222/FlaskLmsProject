@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Рейтинг — EduOnline{% endblock %}
+{% block content %}
+<h2 class="mb-4">Таблица лидеров</h2>
+
+{# Фильтр по курсу #}
+<form method="GET" class="mb-4 d-flex gap-2 align-items-end flex-wrap">
+    <div>
+        <label class="form-label">Курс</label>
+        <select name="course_id" class="form-select">
+            <option value="">Все курсы</option>
+            {% for c in courses %}
+            <option value="{{ c.id }}" {{ 'selected' if c.id == selected_course }}>
+                {{ c.title }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <button class="btn btn-primary">Показать</button>
+</form>
+
+{% if board %}
+<table class="table table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>#</th>
+            <th>Студент</th>
+            <th>Баллы</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in board %}
+        <tr>
+            <td>
+                {% if loop.index == 1 %}🥇
+                {% elif loop.index == 2 %}🥈
+                {% elif loop.index == 3 %}🥉
+                {% else %}{{ loop.index }}
+                {% endif %}
+            </td>
+            <td>{{ row.username }}</td>
+            <td><strong>{{ row.total_score }}</strong></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted">Пока нет оценённых работ.</p>
+{% endif %}
+
+{# Выгрузка отчётов #}
+<hr>
+<h5>Скачать отчёт</h5>
+<div class="d-flex gap-2">
+    <a href="{{ url_for('stats.report_csv', course_id=selected_course or '') }}"
+       class="btn btn-outline-success btn-sm">📥 CSV</a>
+    <a href="{{ url_for('stats.report_xlsx', course_id=selected_course or '') }}"
+       class="btn btn-outline-success btn-sm">📥 XLSX</a>
+    <a href="{{ url_for('stats.report_pdf', course_id=selected_course or '') }}"
+       class="btn btn-outline-danger btn-sm">📥 PDF</a>
+</div>
+{% endblock %}
