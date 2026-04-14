@@ -1,9 +1,11 @@
 import os
 import uuid
+
 from flask import (
     Blueprint, request, redirect, url_for, session, flash,
     send_from_directory, current_app,
 )
+
 from database.db import query_one, execute
 from utils.decorators import login_required, role_required
 

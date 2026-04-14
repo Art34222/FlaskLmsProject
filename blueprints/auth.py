@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+
 from database.db import query_one, execute
 from services.auth_service import (
     hash_password, verify_password,
@@ -20,6 +21,10 @@ def register():
 
     if not email or not username or not password:
         flash("Заполните все поля.", "danger")
+        return redirect(url_for("auth.register"))
+
+    if len(email) > 100 or len(username) > 50 or len(password) > 100:
+        flash("Превышен лимит символов (email и пароль до 100, имя до 50).", "danger")
         return redirect(url_for("auth.register"))
 
     if role not in ("student", "teacher"):
@@ -49,6 +54,10 @@ def login():
     email = request.form.get("email", "").strip()
     password = request.form.get("password", "")
 
+    if len(email) > 100 or len(password) > 100:
+        flash("Превышен лимит символов (email и пароль до 100).", "danger")
+        return redirect(url_for("auth.register"))
+
     user = query_one("SELECT * FROM users WHERE email = ?", (email,))
     if not user or not verify_password(user["password_hash"], password):
         flash("Неверный email или пароль.", "danger")
@@ -73,6 +82,11 @@ def verify_2fa():
         return render_template("auth/2fa_verify.html")
 
     code = request.form.get("code", "").strip()
+
+    if len(code) != 6:
+        flash("Неверный формат кода.", "danger")
+        return redirect(request.url)
+
     user = query_one("SELECT * FROM users WHERE id = ?", (user_id,))
 
     if user and verify_otp(user["otp_secret"], code):
@@ -100,11 +114,15 @@ def setup_2fa():
 
     # POST: пользователь подтверждает, что отсканировал QR и вводит код
     code = request.form.get("code", "").strip()
+
+    if len(code) != 6:
+        flash("Неверный формат кода.", "danger")
+        return redirect(request.url)
+
     if verify_otp(user["otp_secret"], code):
         execute("UPDATE users SET otp_enabled = 1 WHERE id = ?", (user["id"],))
         flash("Двухфакторная аутентификация включена!", "success")
         return redirect(url_for("courses.course_list"))
-
     flash("Неверный код. Попробуйте ещё раз.", "danger")
     return redirect(url_for("auth.setup_2fa"))
 

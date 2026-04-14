@@ -1,5 +1,6 @@
 import os
 import sqlite3
+
 from flask import g, current_app
 
 
@@ -7,7 +8,7 @@ def get_db():
     """Возвращает соединение с БД, привязанное к текущему запросу."""
     if "db" not in g:
         g.db = sqlite3.connect(current_app.config["DATABASE"])
-        g.db.row_factory = sqlite3.Row          # доступ по имени столбца
+        g.db.row_factory = sqlite3.Row  # доступ по имени столбца
         g.db.execute("PRAGMA foreign_keys = ON")
     return g.db
 

@@ -46,21 +46,22 @@ def get_leaderboard(course_id: int | None = None):
     """
     if course_id:
         return query_all("""
-            SELECT u.id, u.username, COALESCE(SUM(s.score), 0) AS total_score
-            FROM users u
-            JOIN submissions s ON s.student_id = u.id
-            JOIN tasks t ON t.id = s.task_id
-            JOIN lessons l ON l.id = t.lesson_id
-            WHERE l.course_id = ? AND s.score IS NOT NULL
-            GROUP BY u.id
-            ORDER BY total_score DESC
-        """, (course_id,))
+                         SELECT u.id, u.username, COALESCE(SUM(s.score), 0) AS total_score
+                         FROM users u
+                                  JOIN submissions s ON s.student_id = u.id
+                                  JOIN tasks t ON t.id = s.task_id
+                                  JOIN lessons l ON l.id = t.lesson_id
+                         WHERE l.course_id = ?
+                           AND s.score IS NOT NULL
+                         GROUP BY u.id
+                         ORDER BY total_score DESC
+                         """, (course_id,))
     else:
         return query_all("""
-            SELECT u.id, u.username, COALESCE(SUM(s.score), 0) AS total_score
-            FROM users u
-            JOIN submissions s ON s.student_id = u.id
-            WHERE s.score IS NOT NULL
-            GROUP BY u.id
-            ORDER BY total_score DESC
-        """)
+                         SELECT u.id, u.username, COALESCE(SUM(s.score), 0) AS total_score
+                         FROM users u
+                                  JOIN submissions s ON s.student_id = u.id
+                         WHERE s.score IS NOT NULL
+                         GROUP BY u.id
+                         ORDER BY total_score DESC
+                         """)

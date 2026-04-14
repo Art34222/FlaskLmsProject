@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+
 from database.db import query_one, query_all, execute
-from utils.decorators import login_required, role_required
 from services.grading_service import auto_check_test
+from utils.decorators import login_required, role_required
 
 tasks_bp = Blueprint("tasks", __name__)
 
@@ -31,14 +32,27 @@ def create_task(lesson_id):
     )
     task_id = execute(
         """INSERT INTO tasks (lesson_id, title, description, task_type,
-           correct_answer, max_score, position) VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                              correct_answer, max_score, position)
+           VALUES (?, ?, ?, ?, ?, ?, ?)""",
         (lesson_id, title, description, task_type, correct_answer,
          max_score, (max_pos["mp"] or 0) + 1),
     )
 
+    if len(title) > 150 or len(description) > 2000:
+        flash("Название (до 150) или описание (до 2000) слишком длинное.", "danger")
+        return redirect(url_for("tasks.create_task", lesson_id=lesson_id))
+
+    if correct_answer and len(correct_answer) > 2000:
+        flash("Эталонный ответ слишком длинный (максимум 2000 символов).", "danger")
+        return redirect(url_for("tasks.create_task", lesson_id=lesson_id))
+
     # Если тест — добавляем варианты ответов
     if task_type == "test":
         options = request.form.getlist("options")
+        for opt in options:
+            if len(opt) > 200:
+                flash("Один из вариантов ответа слишком длинный (макс 200 символов).", "danger")
+                return redirect(url_for("tasks.create_task", lesson_id=lesson_id))
         correct_indices = request.form.getlist("correct_options")  # индексы правильных
         for i, label in enumerate(options):
             if label.strip():
@@ -87,6 +101,10 @@ def submit_answer(task_id):
 
     answer = request.form.get("answer", "").strip()
 
+    if len(answer) > 5000:
+        flash("Ваш ответ слишком длинный (максимум 5000 символов).", "danger")
+        return redirect(url_for("tasks.task_detail", task_id=task_id))
+
     sub_id = execute(
         "INSERT INTO submissions (task_id, student_id, answer) VALUES (?, ?, ?)",
         (task_id, session["user_id"], answer),
@@ -112,30 +130,49 @@ def submit_answer(task_id):
 def submissions_list():
     """Список ответов на ручную проверку (open-задания, без оценки)."""
     subs = query_all("""
-        SELECT s.*, t.title AS task_title, t.max_score, u.username,
-               t.task_type, l.course_id
-        FROM submissions s
-        JOIN tasks t   ON t.id = s.task_id
-        JOIN users u   ON u.id = s.student_id
-        JOIN lessons l ON l.id = t.lesson_id
-        JOIN courses c ON c.id = l.course_id
-        WHERE c.teacher_id = ? AND s.score IS NULL AND t.task_type = 'open'
-        ORDER BY s.submitted_at
-    """, (session["user_id"],))
+                     SELECT s.*,
+                            t.title AS task_title,
+                            t.max_score,
+                            u.username,
+                            t.task_type,
+                            l.course_id
+                     FROM submissions s
+                              JOIN tasks t ON t.id = s.task_id
+                              JOIN users u ON u.id = s.student_id
+                              JOIN lessons l ON l.id = t.lesson_id
+                              JOIN courses c ON c.id = l.course_id
+                     WHERE c.teacher_id = ?
+                       AND s.score IS NULL
+                       AND t.task_type = 'open'
+                     ORDER BY s.submitted_at
+                     """, (session["user_id"],))
     return render_template("tasks/submissions.html", submissions=subs)
 
 
 @tasks_bp.route("/submissions/<int:sub_id>/grade", methods=["POST"])
 @role_required("teacher", "admin")
 def grade_submission(sub_id):
-    score = request.form.get("score")
+    score_raw = request.form.get("score")
+
+    if not score_raw:
+        flash("Укажите оценку.", "danger")
+        return redirect(url_for("tasks.submissions_list"))
+
+    try:
+        score = int(score_raw)
+    except ValueError:
+        flash("Оценка должна быть числом!", "danger")
+        return redirect(url_for("tasks.submissions_list"))
+
     if score is None:
         flash("Укажите оценку.", "danger")
         return redirect(url_for("tasks.submissions_list"))
 
     execute(
         """UPDATE submissions
-           SET score = ?, checked_by = ?, checked_at = datetime('now')
+           SET score      = ?,
+               checked_by = ?,
+               checked_at = datetime('now')
            WHERE id = ?""",
         (int(score), session["user_id"], sub_id),
     )

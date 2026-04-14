@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template, request, Response, session
+from flask import Blueprint, render_template, request, Response
+
 from database.db import query_all
-from utils.decorators import login_required
 from services.grading_service import get_leaderboard
 from services.report_service import generate_csv, generate_xlsx, generate_pdf_html
+from utils.decorators import login_required
 
 stats_bp = Blueprint("stats", __name__)
 

@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+
 from database.db import query_one, query_all, execute
 from utils.decorators import login_required, role_required
 
@@ -20,11 +21,12 @@ def course_list():
     else:
         # Студент видит курсы, на которые записан
         courses = query_all("""
-            SELECT c.* FROM courses c
-            JOIN enrollments e ON e.course_id = c.id
-            WHERE e.user_id = ?
-            ORDER BY c.created_at DESC
-        """, (session["user_id"],))
+                            SELECT c.*
+                            FROM courses c
+                                     JOIN enrollments e ON e.course_id = c.id
+                            WHERE e.user_id = ?
+                            ORDER BY c.created_at DESC
+                            """, (session["user_id"],))
 
     all_courses = query_all("SELECT * FROM courses ORDER BY created_at DESC")
     return render_template("courses/list.html", courses=courses, all_courses=all_courses)
@@ -43,6 +45,14 @@ def create_course():
 
     if not title:
         flash("Название курса обязательно.", "danger")
+        return redirect(url_for("courses.create_course"))
+
+    if len(title) > 150:
+        flash("Название курса слишком длинное (максимум 150 символов).", "danger")
+        return redirect(url_for("courses.create_course"))
+
+    if len(description) > 2000:
+        flash("Описание слишком длинное (максимум 2000 символов).", "danger")
         return redirect(url_for("courses.create_course"))
 
     execute(
@@ -105,6 +115,14 @@ def create_lesson(course_id):
 
     title = request.form.get("title", "").strip()
     content = request.form.get("content", "").strip()
+
+    if len(title) > 100:
+        flash("Название урока слишком длинное (максимум 100 символов).", "danger")
+        return redirect(url_for("courses.create_course", course_id=course_id))
+
+    if len(content) > 10000:
+        flash("Количество символов в уроке превышает допстимый лимит в 10000 символов.", "danger")
+        return redirect(url_for("courses.create_course", course_id=course_id))
 
     max_pos = query_one(
         "SELECT COALESCE(MAX(position), 0) AS mp FROM lessons WHERE course_id = ?",
