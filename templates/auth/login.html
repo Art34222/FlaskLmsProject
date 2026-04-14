@@ -7,11 +7,11 @@
         <form method="POST">
             <div class="mb-3">
                 <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" required>
+                <input type="email" name="email" class="form-control" required maxlength="100">
             </div>
             <div class="mb-3">
                 <label class="form-label">Пароль</label>
-                <input type="password" name="password" class="form-control" required>
+                <input type="password" name="password" class="form-control" required maxlength="100" minlength="8">
             </div>
             <button class="btn btn-primary w-100">Войти</button>
         </form>

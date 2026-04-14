@@ -24,7 +24,13 @@ def create_task(lesson_id):
     description = request.form.get("description", "").strip()
     task_type = request.form.get("task_type", "test")
     correct_answer = request.form.get("correct_answer", "").strip() or None
-    max_score = int(request.form.get("max_score", 10))
+    max_score_raw = request.form.get("max_score")
+
+    try:
+        max_score = int(max_score_raw) if max_score_raw else 10
+    except ValueError:
+        flash("Максимальный балл должен быть числом.", "danger")
+        return redirect(url_for("courses.course_detail", course_id=lesson["course_id"]))
 
     max_pos = query_one(
         "SELECT COALESCE(MAX(position), 0) AS mp FROM tasks WHERE lesson_id = ?",

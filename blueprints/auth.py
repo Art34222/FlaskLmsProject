@@ -23,6 +23,10 @@ def register():
         flash("Заполните все поля.", "danger")
         return redirect(url_for("auth.register"))
 
+    if len(password) < 8:
+        flash("Слабый пароль", "danger")
+        return redirect(url_for("auth.register"))
+
     if len(email) > 100 or len(username) > 50 or len(password) > 100:
         flash("Превышен лимит символов (email и пароль до 100, имя до 50).", "danger")
         return redirect(url_for("auth.register"))
@@ -56,7 +60,7 @@ def login():
 
     if len(email) > 100 or len(password) > 100:
         flash("Превышен лимит символов (email и пароль до 100).", "danger")
-        return redirect(url_for("auth.register"))
+        return redirect(url_for("auth.login"))
 
     user = query_one("SELECT * FROM users WHERE email = ?", (email,))
     if not user or not verify_password(user["password_hash"], password):

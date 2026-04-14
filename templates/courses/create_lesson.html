@@ -7,12 +7,12 @@
         <form method="POST">
             <div class="mb-3">
                 <label class="form-label">Название урока</label>
-                <input type="text" name="title" class="form-control" required>
+                <input type="text" name="title" class="form-control" required maxlength="100">
             </div>
             <div class="mb-3">
                 <label class="form-label">Содержание</label>
                 <textarea name="content" class="form-control" rows="6"
-                          placeholder="Текст лекции, пояснения…"></textarea>
+                          placeholder="Текст лекции, пояснения…" maxlength="10000"></textarea>
             </div>
             <button class="btn btn-success">Добавить</button>
             <a href="{{ url_for('courses.course_detail', course_id=course.id) }}"

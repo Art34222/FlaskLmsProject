@@ -38,8 +38,17 @@ def upload_to_lesson(lesson_id):
         return redirect(url_for("courses.course_list"))
 
     file = request.files.get("file")
-    if not file or not _allowed(file.filename):
-        flash("Недопустимый файл.", "danger")
+
+    if not file or not file.filename:
+        flash("Файл не выбран.", "danger")
+        return redirect(url_for("courses.course_detail", course_id=lesson["course_id"]))
+
+    if len(file.filename) > 255:
+        flash("Имя файла слишком длинное (максимум 255 символов).", "danger")
+        return redirect(url_for("courses.course_detail", course_id=lesson["course_id"]))
+
+    if not _allowed(file.filename):
+        flash("Недопустимый формат файла.", "danger")
         return redirect(url_for("courses.course_detail", course_id=lesson["course_id"]))
 
     orig_name, stored_name = _safe_save(file)

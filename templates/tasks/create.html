@@ -7,11 +7,11 @@
         <form method="POST" id="taskForm">
             <div class="mb-3">
                 <label class="form-label">Название</label>
-                <input type="text" name="title" class="form-control" required>
+                <input type="text" name="title" class="form-control" required maxlength="150">
             </div>
             <div class="mb-3">
                 <label class="form-label">Описание / вопрос</label>
-                <textarea name="description" class="form-control" rows="3"></textarea>
+                <textarea name="description" class="form-control" rows="3" maxlength="2000"></textarea>
             </div>
             <div class="mb-3">
                 <label class="form-label">Тип задания</label>
@@ -22,7 +22,7 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">Макс. баллов</label>
-                <input type="number" name="max_score" class="form-control" value="10" min="1">
+                <input type="number" name="max_score" class="form-control" value="10" min="1" maxlength="10">
             </div>
 
             {# Блок для тестовых вариантов #}
@@ -52,7 +52,7 @@
             <div id="openAnswer" style="display: none;">
                 <div class="mb-3">
                     <label class="form-label">Эталонный ответ (необязательно, для справки)</label>
-                    <textarea name="correct_answer" class="form-control" rows="2"></textarea>
+                    <textarea name="correct_answer" class="form-control" rows="2" maxlength="2000"></textarea>
                 </div>
             </div>
 
