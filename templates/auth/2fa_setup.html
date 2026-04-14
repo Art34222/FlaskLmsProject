@@ -19,7 +19,8 @@
             <div class="mb-3">
                 <label class="form-label">Код из приложения</label>
                 <input type="text" name="code" class="form-control" maxlength="6" minlength="6"
-                       pattern="\d{6}" required placeholder="000000">
+                       pattern="\d{6}" required placeholder="000000" inputmode="numeric"
+                       oninput="this.value = this.value.replace(/[^0-9]/g, '')">
             </div>
             <button class="btn btn-primary w-100">Подтвердить и включить 2FA</button>
         </form>
