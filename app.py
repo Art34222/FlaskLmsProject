@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask
+from flask_wtf import CSRFProtect
 
 from config import Config
 from database.db import init_db, close_db

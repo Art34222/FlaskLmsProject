@@ -32,23 +32,29 @@
     <div class="card-body">
         <h5 class="card-title">Ваш ответ</h5>
 
-        {% if task.task_type == 'test' and options %}
-        <form method="POST" action="{{ url_for('tasks.submit_answer', task_id=task.id) }}">
-            {% for opt in options %}
-            <div class="form-check mb-2">
-                <input class="form-check-input" type="radio" name="answer"
-                       value="{{ opt.label }}" id="opt{{ opt.id }}" required>
-                <label class="form-check-label" for="opt{{ opt.id }}">{{ opt.label }}</label>
+        {% if task.task_type == 'test' %}
+            {% if options %}
+            <form method="POST" action="{{ url_for('tasks.submit_answer', task_id=task.id) }}">
+                {% for opt in options %}
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="radio" name="answer"
+                           value="{{ opt.label }}" id="opt{{ opt.id }}" required>
+                    <label class="form-check-label" for="opt{{ opt.id }}">{{ opt.label }}</label>
+                </div>
+                {% endfor %}
+                <button class="btn btn-primary mt-2">Отправить ответ</button>
+            </form>
+            {% else %}
+            <div class="alert alert-warning mb-0">
+                Задание ещё не настроено преподавателем (нет вариантов ответа).
             </div>
-            {% endfor %}
-            <button class="btn btn-primary mt-2">Отправить ответ</button>
-        </form>
+            {% endif %}
 
         {% elif task.task_type == 'open' %}
         <form method="POST" action="{{ url_for('tasks.submit_answer', task_id=task.id) }}">
             <div class="mb-3">
                 <textarea name="answer" class="form-control" rows="4"
-                          placeholder="Напишите ваш ответ..." required></textarea>
+                          placeholder="Напишите ваш ответ..." required maxlength="5000"></textarea>
             </div>
             <button class="btn btn-primary">Отправить ответ</button>
         </form>

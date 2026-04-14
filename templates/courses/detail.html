@@ -10,7 +10,7 @@
 <p class="text-muted mb-4">{{ course.description }}</p>
 {% endif %}
 
-{% if session.get('role') in ('teacher', 'admin') %}
+{% if can_edit %}
 <a href="{{ url_for('courses.create_lesson', course_id=course.id) }}"
    class="btn btn-success btn-sm mb-3">+ Добавить урок</a>
 {% endif %}
@@ -34,6 +34,16 @@
 
                 {# Файлы урока #}
                 {% set files = get_lesson_files(lesson.id) if get_lesson_files is defined else [] %}
+                {% if files %}
+                <h6>Файлы:</h6>
+                <ul class="list-group mb-3">
+                    {% for f in files %}
+                    <li class="list-group-item">
+                        <a href="{{ url_for('files.download_file', file_id=f.id) }}">{{ f.filename }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
 
                 {# Задания урока #}
                 {% set tasks = get_lesson_tasks(lesson.id) if get_lesson_tasks is defined else [] %}
@@ -51,7 +61,7 @@
                 </ul>
                 {% endif %}
 
-                {% if session.get('role') in ('teacher', 'admin') %}
+                {% if can_edit %}
                 <div class="d-flex gap-2 flex-wrap">
                     <a href="{{ url_for('tasks.create_task', lesson_id=lesson.id) }}"
                        class="btn btn-outline-primary btn-sm">+ Задание</a>

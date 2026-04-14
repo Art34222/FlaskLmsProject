@@ -6,6 +6,15 @@ from utils.decorators import login_required, role_required
 courses_bp = Blueprint("courses", __name__)
 
 
+def _can_edit_course(course) -> bool:
+    """Учитель может редактировать только свои курсы; админ — все."""
+    if not course:
+        return False
+    if session.get("role") == "admin":
+        return True
+    return session.get("role") == "teacher" and course["teacher_id"] == session.get("user_id")
+
+
 # ── Список курсов ────────────────────────────────────────────────
 
 @courses_bp.route("/")
@@ -16,8 +25,10 @@ def course_list():
             "SELECT * FROM courses WHERE teacher_id = ? ORDER BY created_at DESC",
             (session["user_id"],),
         )
+        all_courses = []
     elif session["role"] == "admin":
         courses = query_all("SELECT * FROM courses ORDER BY created_at DESC")
+        all_courses = []
     else:
         # Студент видит курсы, на которые записан
         courses = query_all("""
@@ -27,8 +38,14 @@ def course_list():
                             WHERE e.user_id = ?
                             ORDER BY c.created_at DESC
                             """, (session["user_id"],))
+        # Курсы, доступные для записи (на которые ещё не записан)
+        all_courses = query_all("""
+                                SELECT c.*
+                                FROM courses c
+                                WHERE c.id NOT IN (SELECT course_id FROM enrollments WHERE user_id = ?)
+                                ORDER BY c.created_at DESC
+                                """, (session["user_id"],))
 
-    all_courses = query_all("SELECT * FROM courses ORDER BY created_at DESC")
     return render_template("courses/list.html", courses=courses, all_courses=all_courses)
 
 
@@ -73,11 +90,22 @@ def course_detail(course_id):
         flash("Курс не найден.", "danger")
         return redirect(url_for("courses.course_list"))
 
+    # Студент должен быть записан на курс
+    if session.get("role") == "student":
+        enrolled = query_one(
+            "SELECT id FROM enrollments WHERE user_id = ? AND course_id = ?",
+            (session["user_id"], course_id),
+        )
+        if not enrolled:
+            flash("Вы не записаны на этот курс.", "warning")
+            return redirect(url_for("courses.course_list"))
+
     lessons = query_all(
         "SELECT * FROM lessons WHERE course_id = ? ORDER BY position",
         (course_id,),
     )
-    return render_template("courses/detail.html", course=course, lessons=lessons)
+    can_edit = _can_edit_course(course)
+    return render_template("courses/detail.html", course=course, lessons=lessons, can_edit=can_edit)
 
 
 # ── Запись на курс (для студентов) ───────────────────────────────
@@ -85,6 +113,12 @@ def course_detail(course_id):
 @courses_bp.route("/<int:course_id>/enroll", methods=["POST"])
 @role_required("student")
 def enroll(course_id):
+    # Проверка существования курса — иначе FK IntegrityError → 500
+    course = query_one("SELECT id FROM courses WHERE id = ?", (course_id,))
+    if not course:
+        flash("Курс не найден.", "danger")
+        return redirect(url_for("courses.course_list"))
+
     existing = query_one(
         "SELECT id FROM enrollments WHERE user_id = ? AND course_id = ?",
         (session["user_id"], course_id),
@@ -110,19 +144,28 @@ def create_lesson(course_id):
         flash("Курс не найден.", "danger")
         return redirect(url_for("courses.course_list"))
 
+    # Проверка владения курсом
+    if not _can_edit_course(course):
+        flash("Нет прав на редактирование этого курса.", "danger")
+        return redirect(url_for("courses.course_list"))
+
     if request.method == "GET":
         return render_template("courses/create_lesson.html", course=course)
 
     title = request.form.get("title", "").strip()
     content = request.form.get("content", "").strip()
 
+    if not title:
+        flash("Название урока обязательно.", "danger")
+        return redirect(url_for("courses.create_lesson", course_id=course_id))
+
     if len(title) > 100:
         flash("Название урока слишком длинное (максимум 100 символов).", "danger")
-        return redirect(url_for("courses.create_course", course_id=course_id))
+        return redirect(url_for("courses.create_lesson", course_id=course_id))
 
     if len(content) > 10000:
-        flash("Количество символов в уроке превышает допстимый лимит в 10000 символов.", "danger")
-        return redirect(url_for("courses.create_course", course_id=course_id))
+        flash("Содержание урока превышает лимит в 10000 символов.", "danger")
+        return redirect(url_for("courses.create_lesson", course_id=course_id))
 
     max_pos = query_one(
         "SELECT COALESCE(MAX(position), 0) AS mp FROM lessons WHERE course_id = ?",

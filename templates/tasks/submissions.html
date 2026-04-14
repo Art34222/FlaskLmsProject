@@ -22,7 +22,7 @@
                 <td>{{ s.task_title }}</td>
                 <td>
                     {% if s.answer %}
-                        {{ s.answer[:100] }}{{ '…' if s.answer|length > 100 }}
+                        {{ s.answer[:100] }}{% if s.answer|length > 100 %}…{% endif %}
                     {% else %}
                         <em>файл</em>
                     {% endif %}

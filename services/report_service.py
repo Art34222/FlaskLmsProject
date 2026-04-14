@@ -30,7 +30,6 @@ def _leaderboard_df(course_id: int | None = None) -> pd.DataFrame:
                          ORDER BY 2 DESC
                          """)
 
-    columns = [desc[0] for desc in rows[0].keys()] if rows else []
     data = [dict(r) for r in rows]
     return pd.DataFrame(data)
 

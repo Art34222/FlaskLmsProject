@@ -23,12 +23,12 @@ def register():
         flash("Заполните все поля.", "danger")
         return redirect(url_for("auth.register"))
 
-    if len(password) < 8:
-        flash("Слабый пароль", "danger")
-        return redirect(url_for("auth.register"))
-
     if len(email) > 100 or len(username) > 50 or len(password) > 100:
         flash("Превышен лимит символов (email и пароль до 100, имя до 50).", "danger")
+        return redirect(url_for("auth.register"))
+
+    if len(password) < 8:
+        flash("Слабый пароль (минимум 8 символов).", "danger")
         return redirect(url_for("auth.register"))
 
     if role not in ("student", "teacher"):
@@ -69,9 +69,16 @@ def login():
 
     # Если 2FA включена — перенаправляем на проверку кода
     if user["otp_enabled"]:
-        session["pending_2fa_user_id"] = user["id"]
-        return redirect(url_for("auth.verify_2fa"))
+        if not user["otp_secret"]:
+            # Рассинхронизация: включено, но секрета нет. Сбрасываем флаг.
+            execute("UPDATE users SET otp_enabled = 0 WHERE id = ?", (user["id"],))
+        else:
+            # Защита от session fixation — чистим старую сессию
+            session.clear()
+            session["pending_2fa_user_id"] = user["id"]
+            return redirect(url_for("auth.verify_2fa"))
 
+    session.clear()
     _login_user(user)
     return redirect(url_for("courses.course_list"))
 
@@ -87,13 +94,13 @@ def verify_2fa():
 
     code = request.form.get("code", "").strip()
 
-    if len(code) != 6:
+    if len(code) != 6 or not code.isdigit():
         flash("Неверный формат кода.", "danger")
-        return redirect(request.url)
+        return redirect(url_for("auth.verify_2fa"))
 
     user = query_one("SELECT * FROM users WHERE id = ?", (user_id,))
 
-    if user and verify_otp(user["otp_secret"], code):
+    if user and user["otp_secret"] and verify_otp(user["otp_secret"], code):
         session.pop("pending_2fa_user_id", None)
         _login_user(user)
         return redirect(url_for("courses.course_list"))
@@ -108,6 +115,9 @@ def setup_2fa():
         return redirect(url_for("auth.login"))
 
     user = query_one("SELECT * FROM users WHERE id = ?", (session["user_id"],))
+    if not user:
+        session.clear()
+        return redirect(url_for("auth.login"))
 
     if request.method == "GET":
         secret = user["otp_secret"] or generate_otp_secret()
@@ -119,14 +129,15 @@ def setup_2fa():
     # POST: пользователь подтверждает, что отсканировал QR и вводит код
     code = request.form.get("code", "").strip()
 
-    if len(code) != 6:
+    if len(code) != 6 or not code.isdigit():
         flash("Неверный формат кода.", "danger")
-        return redirect(request.url)
+        return redirect(url_for("auth.setup_2fa"))
 
-    if verify_otp(user["otp_secret"], code):
+    if user["otp_secret"] and verify_otp(user["otp_secret"], code):
         execute("UPDATE users SET otp_enabled = 1 WHERE id = ?", (user["id"],))
         flash("Двухфакторная аутентификация включена!", "success")
         return redirect(url_for("courses.course_list"))
+
     flash("Неверный код. Попробуйте ещё раз.", "danger")
     return redirect(url_for("auth.setup_2fa"))
 

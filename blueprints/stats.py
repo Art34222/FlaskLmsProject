@@ -62,6 +62,5 @@ def report_pdf():
             mimetype="application/pdf",
             headers={"Content-Disposition": "attachment; filename=report.pdf"},
         )
-    except Exception:
-        # wkhtmltopdf не установлен — отдаём HTML
+    except (ImportError, OSError):
         return Response(html, mimetype="text/html")
