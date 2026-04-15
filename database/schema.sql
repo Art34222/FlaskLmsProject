@@ -73,3 +73,8 @@ CREATE TABLE IF NOT EXISTS submissions (
     submitted_at TEXT   NOT NULL DEFAULT (datetime('now')),
     checked_at  TEXT
 );
+
+CREATE INDEX IF NOT EXISTS idx_submissions_student ON submissions(student_id);
+CREATE INDEX IF NOT EXISTS idx_submissions_task ON submissions(task_id);
+CREATE INDEX IF NOT EXISTS idx_lessons_course ON lessons(course_id);
+CREATE INDEX IF NOT EXISTS idx_enrollments_user ON enrollments(user_id, course_id);
