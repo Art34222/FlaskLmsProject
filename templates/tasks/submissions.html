@@ -30,6 +30,7 @@
                 <td>{{ s.submitted_at }}</td>
                 <td>
                     <form method="POST" class="d-flex gap-2"
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                           action="{{ url_for('tasks.grade_submission', sub_id=s.id) }}">
                         <input type="number" name="score" class="form-control form-control-sm"
                                style="width: 80px" min="0" max="{{ s.max_score }}"

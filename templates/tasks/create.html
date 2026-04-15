@@ -5,6 +5,7 @@
     <div class="col-md-7">
         <h2 class="mb-4">Создать задание к уроку «{{ lesson.title }}»</h2>
         <form method="POST" id="taskForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="mb-3">
                 <label class="form-label">Название</label>
                 <input type="text" name="title" class="form-control" required maxlength="150">

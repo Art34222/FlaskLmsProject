@@ -49,6 +49,7 @@
             </div>
             <div class="card-footer">
                 <form method="POST" action="{{ url_for('courses.enroll', course_id=c.id) }}" class="d-inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button class="btn btn-outline-primary btn-sm">Записаться</button>
                 </form>
                 <a href="{{ url_for('courses.course_detail', course_id=c.id) }}"

@@ -6,6 +6,7 @@
         <h2 class="mb-4">Двухфакторная аутентификация</h2>
         <p>Введите 6-значный код из приложения 2FA кодов.</p>
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="mb-3">
                 <input type="text" name="code" class="form-control form-control-lg text-center"
                        maxlength="6" minlength="6" pattern="\d{6}" required placeholder="000000"

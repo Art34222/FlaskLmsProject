@@ -2,10 +2,10 @@ import os
 
 from flask import Flask
 from waitress import serve
-
+from flask_wtf.csrf import CSRFProtect
 from config import Config
 from database.db import init_db, close_db
-
+csrf = CSRFProtect()
 
 def create_app():
     app = Flask(__name__)
@@ -56,7 +56,8 @@ def create_app():
         if "user_id" in session:
             return redirect(url_for("courses.course_list"))
         return redirect(url_for("auth.login"))
-
+    
+    csrf.init_app(app)
     return app
 
 
