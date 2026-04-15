@@ -5,15 +5,24 @@
     <div class="col-md-6">
         <h2 class="mb-4">Настройка двухфакторной аутентификации</h2>
         <p>Отсканируйте QR-код в приложении Google Authenticator (или аналогичном),
-           затем введите 6-значный код для подтверждения.</p>
+            затем введите 6-значный код для подтверждения.</p>
 
         <div class="text-center mb-3">
             <img src="{{ qr }}" alt="QR-код для 2FA" style="max-width: 250px;">
         </div>
 
-        <p class="text-muted text-center small">
-            Или введите ключ вручную: <code>{{ secret }}</code>
-        </p>
+        <div class="mb-4">
+            <p class="text-muted small mb-1">Если не можете отсканировать QR-код, введите этот ключ вручную:</p>
+            <div class="input-group">
+                <input type="text" id="secretKey" class="form-control font-monospace text-center fw-bold"
+                       value="{{ secret }}" readonly>
+
+                <button class="btn btn-outline-primary" type="button"
+                        onclick="navigator.clipboard.writeText(document.getElementById('secretKey').value);">
+                    Копировать
+                </button>
+            </div>
+        </div>
 
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">

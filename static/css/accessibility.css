@@ -9,7 +9,7 @@ body.a11y {
 
 body.a11y .navbar {
     background-color: #000 !important;
-    border-bottom: 3px solid #ff0 !important;
+    border-bottom: 5px solid #ff0 !important;
 }
 
 body.a11y .navbar-brand,
@@ -80,11 +80,6 @@ body.a11y .accordion-button {
 body.a11y .accordion-body {
     background-color: #111 !important;
     color: #fff !important;
-}
-
-body.a11y a {
-    color: #5cf !important;
-    text-decoration: underline !important;
 }
 
 body.a11y #a11y-toggle {

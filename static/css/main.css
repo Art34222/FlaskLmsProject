@@ -17,7 +17,7 @@ body {
 
 .navbar-brand {
     font-weight: 700;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
 }
 
 .accordion-button:not(.collapsed) {
@@ -39,3 +39,8 @@ body {
 .table tbody tr:nth-child(3) td {
     background-color: #fff3e0;
 }
+.navbar-nav .nav-link { border-bottom: 3px solid transparent; }
+.navbar-nav .active-nav-link { border-bottom-color: white; }
+
+.navbar-brand { transition: opacity 0.2s; }
+.navbar-brand:hover { opacity: 0.7; }
