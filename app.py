@@ -1,6 +1,7 @@
 import os
 
 from flask import Flask
+from waitress import serve
 
 from config import Config
 from database.db import init_db, close_db
@@ -61,4 +62,4 @@ def create_app():
 
 if __name__ == "__main__":
     application = create_app()
-    application.run(port=5000)
+    serve(application, host="0.0.0.0", port=5000)
