@@ -66,43 +66,43 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const typeSelect = document.getElementById('taskType');
-    const testBlock = document.getElementById('testOptions');
-    const openBlock = document.getElementById('openAnswer');
-    const correctAnswerField = document.getElementById('correctAnswerField');
-    const container = document.getElementById('optionsContainer');
-    const addBtn = document.getElementById('addOption');
-    let optCount = 2;
+    document.addEventListener('DOMContentLoaded', () => {
+        const typeSelect = document.getElementById('taskType');
+        const testBlock = document.getElementById('testOptions');
+        const openBlock = document.getElementById('openAnswer');
+        const correctAnswerField = document.getElementById('correctAnswerField');
+        const container = document.getElementById('optionsContainer');
+        const addBtn = document.getElementById('addOption');
+        let optCount = 2;
 
-    function updateVisibility() {
-        const isTest = typeSelect.value === 'test';
-        testBlock.style.display = isTest ? '' : 'none';
-        openBlock.style.display = isTest ? 'none' : '';
-        // Очищаем неиспользуемое поле чтобы не отправлять лишние данные
-        if (isTest) {
-            correctAnswerField.value = '';
-        } else {
-            container.querySelectorAll('input[name="options"]').forEach(i => i.value = '');
-            container.querySelectorAll('input[name="correct_options"]').forEach(i => i.checked = false);
+        function updateVisibility() {
+            const isTest = typeSelect.value === 'test';
+            testBlock.style.display = isTest ? '' : 'none';
+            openBlock.style.display = isTest ? 'none' : '';
+            // Очищаем неиспользуемое поле чтобы не отправлять лишние данные
+            if (isTest) {
+                correctAnswerField.value = '';
+            } else {
+                container.querySelectorAll('input[name="options"]').forEach(i => i.value = '');
+                container.querySelectorAll('input[name="correct_options"]').forEach(i => i.checked = false);
+            }
         }
-    }
 
-    typeSelect.addEventListener('change', updateVisibility);
+        typeSelect.addEventListener('change', updateVisibility);
 
-    addBtn.addEventListener('click', () => {
-        const div = document.createElement('div');
-        div.className = 'input-group mb-2';
-        div.innerHTML = `
+        addBtn.addEventListener('click', () => {
+            const div = document.createElement('div');
+            div.className = 'input-group mb-2';
+            div.innerHTML = `
             <div class="input-group-text">
                 <input type="checkbox" name="correct_options" value="${optCount}">
             </div>
             <input type="text" name="options" class="form-control"
                    placeholder="Вариант ${optCount + 1}" maxlength="200">
         `;
-        container.appendChild(div);
-        optCount++;
+            container.appendChild(div);
+            optCount++;
+        });
     });
-});
 </script>
 {% endblock %}

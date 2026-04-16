@@ -28,9 +28,9 @@
 {% else %}
 <p class="text-muted">
     {% if session.get('role') == 'student' %}
-        Вы пока не записаны ни на один курс. Выберите курс ниже.
+    Вы пока не записаны ни на один курс. Выберите курс ниже.
     {% else %}
-        У вас пока нет курсов. Создайте первый!
+    У вас пока нет курсов. Создайте первый!
     {% endif %}
 </p>
 {% endif %}
@@ -49,7 +49,7 @@
             </div>
             <div class="card-footer">
                 <form method="POST" action="{{ url_for('courses.enroll', course_id=c.id) }}" class="d-inline">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button class="btn btn-outline-primary btn-sm">Записаться</button>
                 </form>
                 <a href="{{ url_for('courses.course_detail', course_id=c.id) }}"

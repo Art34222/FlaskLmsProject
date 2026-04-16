@@ -10,7 +10,7 @@
         <select name="course_id" class="form-select">
             <option value="">Все курсы</option>
             {% for c in courses %}
-            <option value="{{ c.id }}" {% if c.id == selected_course %}selected{% endif %}>
+            <option value="{{ c.id }}" {% if c.id== selected_course %}selected{% endif %}>
                 {{ c.title }}
             </option>
             {% endfor %}
@@ -22,26 +22,26 @@
 {% if board %}
 <table class="table table-hover">
     <thead class="table-dark">
-        <tr>
-            <th>#</th>
-            <th>Студент</th>
-            <th>Баллы</th>
-        </tr>
+    <tr>
+        <th>#</th>
+        <th>Студент</th>
+        <th>Баллы</th>
+    </tr>
     </thead>
     <tbody>
-        {% for row in board %}
-        <tr>
-            <td>
-                {% if loop.index == 1 %}🥇
-                {% elif loop.index == 2 %}🥈
-                {% elif loop.index == 3 %}🥉
-                {% else %}{{ loop.index }}
-                {% endif %}
-            </td>
-            <td>{{ row.username }}</td>
-            <td><strong>{{ row.total_score }}</strong></td>
-        </tr>
-        {% endfor %}
+    {% for row in board %}
+    <tr>
+        <td>
+            {% if loop.index == 1 %}🥇
+            {% elif loop.index == 2 %}🥈
+            {% elif loop.index == 3 %}🥉
+            {% else %}{{ loop.index }}
+            {% endif %}
+        </td>
+        <td>{{ row.username }}</td>
+        <td><strong>{{ row.total_score }}</strong></td>
+    </tr>
+    {% endfor %}
     </tbody>
 </table>
 {% else %}

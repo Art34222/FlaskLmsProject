@@ -67,9 +67,9 @@
                        class="btn btn-outline-primary btn-sm">+ Задание</a>
 
                     <form method="POST" enctype="multipart/form-data"
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                           action="{{ url_for('files.upload_to_lesson', lesson_id=lesson.id) }}"
                           class="d-flex gap-2">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="file" name="file" class="form-control form-control-sm" style="max-width: 250px;">
                         <button class="btn btn-outline-secondary btn-sm">Загрузить файл</button>
                     </form>

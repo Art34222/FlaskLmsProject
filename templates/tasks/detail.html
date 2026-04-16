@@ -19,9 +19,9 @@
 <div class="alert alert-{{ 'success' if submission.score is not none else 'secondary' }} mt-3">
     <strong>Ваш ответ:</strong> {{ submission.answer or '(файл)' }}<br>
     {% if submission.score is not none %}
-        <strong>Оценка:</strong> {{ submission.score }} / {{ task.max_score }}
+    <strong>Оценка:</strong> {{ submission.score }} / {{ task.max_score }}
     {% else %}
-        <em>Ожидает проверки</em>
+    <em>Ожидает проверки</em>
     {% endif %}
 </div>
 {% endif %}
@@ -33,23 +33,23 @@
         <h5 class="card-title">Ваш ответ</h5>
 
         {% if task.task_type == 'test' %}
-            {% if options %}
-            <form method="POST" action="{{ url_for('tasks.submit_answer', task_id=task.id) }}">
+        {% if options %}
+        <form method="POST" action="{{ url_for('tasks.submit_answer', task_id=task.id) }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                {% for opt in options %}
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="answer"
-                           value="{{ opt.label }}" id="opt{{ opt.id }}" required>
-                    <label class="form-check-label" for="opt{{ opt.id }}">{{ opt.label }}</label>
-                </div>
-                {% endfor %}
-                <button class="btn btn-primary mt-2">Отправить ответ</button>
-            </form>
-            {% else %}
-            <div class="alert alert-warning mb-0">
-                Задание ещё не настроено преподавателем (нет вариантов ответа).
+            {% for opt in options %}
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="radio" name="answer"
+                       value="{{ opt.label }}" id="opt{{ opt.id }}" required>
+                <label class="form-check-label" for="opt{{ opt.id }}">{{ opt.label }}</label>
             </div>
-            {% endif %}
+            {% endfor %}
+            <button class="btn btn-primary mt-2">Отправить ответ</button>
+        </form>
+        {% else %}
+        <div class="alert alert-warning mb-0">
+            Задание ещё не настроено преподавателем (нет вариантов ответа).
+        </div>
+        {% endif %}
 
         {% elif task.task_type == 'open' %}
         <form method="POST" action="{{ url_for('tasks.submit_answer', task_id=task.id) }}">
@@ -64,8 +64,8 @@
         <hr>
         <p class="text-muted small">Или загрузите файл с решением:</p>
         <form method="POST" enctype="multipart/form-data"
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
               action="{{ url_for('files.upload_submission_file', task_id=task.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="d-flex gap-2">
                 <input type="file" name="file" class="form-control form-control-sm" required>
                 <button class="btn btn-outline-primary btn-sm">Загрузить</button>

@@ -7,39 +7,39 @@
 <div class="table-responsive">
     <table class="table table-striped align-middle">
         <thead>
-            <tr>
-                <th>Студент</th>
-                <th>Задание</th>
-                <th>Ответ</th>
-                <th>Дата</th>
-                <th>Оценка</th>
-            </tr>
+        <tr>
+            <th>Студент</th>
+            <th>Задание</th>
+            <th>Ответ</th>
+            <th>Дата</th>
+            <th>Оценка</th>
+        </tr>
         </thead>
         <tbody>
-            {% for s in submissions %}
-            <tr>
-                <td>{{ s.username }}</td>
-                <td>{{ s.task_title }}</td>
-                <td>
-                    {% if s.answer %}
-                        {{ s.answer[:100] }}{% if s.answer|length > 100 %}…{% endif %}
-                    {% else %}
-                        <em>файл</em>
-                    {% endif %}
-                </td>
-                <td>{{ s.submitted_at }}</td>
-                <td>
-                    <form method="POST" class="d-flex gap-2"
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                          action="{{ url_for('tasks.grade_submission', sub_id=s.id) }}">
-                        <input type="number" name="score" class="form-control form-control-sm"
-                               style="width: 80px" min="0" max="{{ s.max_score }}"
-                               placeholder="0–{{ s.max_score }}" required>
-                        <button class="btn btn-sm btn-primary">OK</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
+        {% for s in submissions %}
+        <tr>
+            <td>{{ s.username }}</td>
+            <td>{{ s.task_title }}</td>
+            <td>
+                {% if s.answer %}
+                {{ s.answer[:100] }}{% if s.answer|length > 100 %}…{% endif %}
+                {% else %}
+                <em>файл</em>
+                {% endif %}
+            </td>
+            <td>{{ s.submitted_at }}</td>
+            <td>
+                <form method="POST" class="d-flex gap-2"
+                      action="{{ url_for('tasks.grade_submission', sub_id=s.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="number" name="score" class="form-control form-control-sm"
+                           style="width: 80px" min="0" max="{{ s.max_score }}"
+                           placeholder="0–{{ s.max_score }}" required>
+                    <button class="btn btn-sm btn-primary">OK</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
         </tbody>
     </table>
 </div>
