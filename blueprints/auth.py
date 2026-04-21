@@ -19,9 +19,10 @@ def register():
     email = request.form.get("email", "").strip()
     username = request.form.get("username", "").strip()
     password = request.form.get("password", "")
+    password_confirm = request.form.get("password_confirm", "")
     role = request.form.get("role", "student")
 
-    if not email or not username or not password:
+    if not email or not username or not password or not password_confirm:
         flash("Заполните все поля.", "danger")
         return redirect(url_for("auth.register"))
 
@@ -31,6 +32,10 @@ def register():
 
     if len(password) < 8:
         flash("Слабый пароль (минимум 8 символов).", "danger")
+        return redirect(url_for("auth.register"))
+
+    if password != password_confirm:
+        flash("Пароли не совпадают.", "danger")
         return redirect(url_for("auth.register"))
 
     if role not in ("student", "teacher"):

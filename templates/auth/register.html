@@ -4,7 +4,7 @@
 <div class="row justify-content-center">
     <div class="col-md-5">
         <h2 class="mb-4">Регистрация</h2>
-        <form method="POST">
+        <form method="POST" id="registerForm">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="mb-3">
                 <label class="form-label">Email</label>
@@ -16,7 +16,14 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">Пароль</label>
-                <input type="password" name="password" class="form-control" required minlength="8" maxlength="100">
+                <input type="password" name="password" id="password"
+                       class="form-control" required minlength="8" maxlength="100">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Повторите пароль</label>
+                <input type="password" name="password_confirm" id="passwordConfirm"
+                       class="form-control" required minlength="8" maxlength="100">
+                <div class="invalid-feedback">Пароли не совпадают.</div>
             </div>
             <div class="mb-3">
                 <label class="form-label">Роль</label>
@@ -32,4 +39,24 @@
         </p>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const password = document.getElementById('password');
+        const confirm = document.getElementById('passwordConfirm');
+
+        function check() {
+            if (confirm.value && password.value !== confirm.value) {
+                confirm.setCustomValidity('mismatch');
+                confirm.classList.add('is-invalid');
+            } else {
+                confirm.setCustomValidity('');
+                confirm.classList.remove('is-invalid');
+            }
+        }
+
+        password.addEventListener('input', check);
+        confirm.addEventListener('input', check);
+    });
+</script>
 {% endblock %}
