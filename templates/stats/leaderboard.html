@@ -48,7 +48,8 @@
 <p class="text-muted">Пока нет оценённых работ.</p>
 {% endif %}
 
-{# Выгрузка отчётов #}
+{# Выгрузка отчётов — только для учителей и админа #}
+{% if session.get('role') in ('teacher', 'admin') %}
 <hr>
 <h5>Скачать отчёт</h5>
 <div class="d-flex gap-2">
@@ -59,4 +60,5 @@
     <a href="{{ url_for('stats.report_pdf', course_id=selected_course or '') }}"
        class="btn btn-outline-danger btn-sm">📥 PDF</a>
 </div>
+{% endif %}
 {% endblock %}

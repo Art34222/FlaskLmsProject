@@ -8,6 +8,8 @@ from services.auth_service import (
 
 auth_bp = Blueprint("auth", __name__)
 
+MAX_2FA_ATTEMPTS = 5
+
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
@@ -92,9 +94,18 @@ def verify_2fa():
     if request.method == "GET":
         return render_template("auth/2fa_verify.html")
 
+    # Защита от брутфорса: после MAX_2FA_ATTEMPTS неудач сбрасываем сессию
+    # и заставляем начать вход заново.
+    attempts = session.get("2fa_attempts", 0)
+    if attempts >= MAX_2FA_ATTEMPTS:
+        session.clear()
+        flash("Слишком много неудачных попыток. Войдите заново.", "danger")
+        return redirect(url_for("auth.login"))
+
     code = request.form.get("code", "").strip()
 
     if len(code) != 6 or not code.isdigit():
+        session["2fa_attempts"] = attempts + 1
         flash("Неверный формат кода.", "danger")
         return redirect(url_for("auth.verify_2fa"))
 
@@ -102,9 +113,11 @@ def verify_2fa():
 
     if user and user["otp_secret"] and verify_otp(user["otp_secret"], code):
         session.pop("pending_2fa_user_id", None)
+        session.pop("2fa_attempts", None)
         _login_user(user)
         return redirect(url_for("courses.course_list"))
 
+    session["2fa_attempts"] = attempts + 1
     flash("Неверный код. Попробуйте ещё раз.", "danger")
     return redirect(url_for("auth.verify_2fa"))
 
@@ -127,17 +140,26 @@ def setup_2fa():
         return render_template("auth/2fa_setup.html", qr=qr, secret=secret)
 
     # POST: пользователь подтверждает, что отсканировал QR и вводит код
+    attempts = session.get("2fa_setup_attempts", 0)
+    if attempts >= MAX_2FA_ATTEMPTS:
+        session.pop("2fa_setup_attempts", None)
+        flash("Слишком много неудачных попыток. Попробуйте настроить 2FA заново.", "danger")
+        return redirect(url_for("courses.course_list"))
+
     code = request.form.get("code", "").strip()
 
     if len(code) != 6 or not code.isdigit():
+        session["2fa_setup_attempts"] = attempts + 1
         flash("Неверный формат кода.", "danger")
         return redirect(url_for("auth.setup_2fa"))
 
     if user["otp_secret"] and verify_otp(user["otp_secret"], code):
         execute("UPDATE users SET otp_enabled = 1 WHERE id = ?", (user["id"],))
+        session.pop("2fa_setup_attempts", None)
         flash("Двухфакторная аутентификация включена!", "success")
         return redirect(url_for("courses.course_list"))
 
+    session["2fa_setup_attempts"] = attempts + 1
     flash("Неверный код. Попробуйте ещё раз.", "danger")
     return redirect(url_for("auth.setup_2fa"))
 

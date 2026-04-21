@@ -63,4 +63,11 @@ def create_app():
 
 if __name__ == "__main__":
     application = create_app()
-    serve(application, host="127.0.0.1", port=5000)
+    serve(
+        application,
+        host="127.0.0.1",
+        port=5000,
+        trusted_proxy="127.0.0.1",
+        trusted_proxy_headers="x-forwarded-for x-forwarded-proto x-forwarded-host",
+        url_scheme="https",
+    )

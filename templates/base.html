@@ -13,12 +13,13 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
     <div class="container">
         <a class="navbar-brand" href="/">EduOnline</a>
+
+        {% if session.get('user_id') %}
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#nav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="nav">
-            {% if session.get('user_id') %}
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1">
                 <li class="nav-item">
                     <a class="nav-link text-white {% if request.endpoint and request.endpoint.startswith('courses.') %}active-nav-link{% endif %}"
@@ -35,7 +36,7 @@
                 </li>
                 {% endif %}
             </ul>
-            <ul class="navbar-nav">
+            <ul class="navbar-nav align-items-lg-center">
                 <li class="nav-item">
                     <span class="nav-link text-light">
                         {{ session.get('username') }} ({{ session.get('role') }})
@@ -45,16 +46,21 @@
                     <a class="nav-link" href="{{ url_for('auth.setup_2fa') }}">2FA</a>
                 </li>
                 <li class="nav-item">
-                    <button class="btn btn-sm btn-outline-light mt-1" id="a11y-toggle">
+                    <button class="btn btn-sm btn-outline-light a11y-toggle" type="button">
                         ☰ Для слабовидящих
                     </button>
                 </li>
-                <li class="nav-item ms-2">
+                <li class="nav-item ms-lg-2">
                     <a class="nav-link" href="{{ url_for('auth.logout') }}">Выйти</a>
                 </li>
             </ul>
-            {% endif %}
         </div>
+        {% else %}
+        {# До логина: бургер не нужен, но кнопка «для слабовидящих» должна остаться #}
+        <button class="btn btn-sm btn-outline-light a11y-toggle ms-auto" type="button">
+            ☰ Для слабовидящих
+        </button>
+        {% endif %}
     </div>
 </nav>
 

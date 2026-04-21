@@ -15,17 +15,24 @@ files_bp = Blueprint("files", __name__)
 ALLOWED_EXTENSIONS = {"pdf", "docx", "doc", "txt", "png", "jpg", "jpeg", "zip", "py"}
 
 
-def _allowed(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+def _get_extension(filename: str) -> str | None:
+    """Возвращает расширение в нижнем регистре или None."""
+    if not filename or "." not in filename:
+        return None
+    return filename.rsplit(".", 1)[1].lower()
 
 
 def _safe_save(file):
-    """Сохраняет файл с уникальным именем, возвращает (оригинальное имя, путь)."""
-    # Санитизируем имя перед использованием
-    original = secure_filename(file.filename) or "file"
-    if "." not in original:
-        raise ValueError("no extension")
-    ext = original.rsplit(".", 1)[1].lower()
+    """
+    Санитизирует имя, проверяет расширение на уже очищенном имени,
+    сохраняет файл под уникальным именем.
+    Возвращает (оригинальное имя, уникальное имя на диске).
+    При некорректном имени/расширении бросает ValueError.
+    """
+    original = secure_filename(file.filename) or ""
+    ext = _get_extension(original)
+    if not ext or ext not in ALLOWED_EXTENSIONS:
+        raise ValueError("bad filename or extension")
     unique = f"{uuid.uuid4().hex}.{ext}"
     path = os.path.join(current_app.config["UPLOAD_FOLDER"], unique)
     file.save(path)
@@ -100,14 +107,10 @@ def upload_to_lesson(lesson_id):
         flash("Имя файла слишком длинное (максимум 255 символов).", "danger")
         return redirect(url_for("courses.course_detail", course_id=lesson["course_id"]))
 
-    if not _allowed(file.filename):
-        flash("Недопустимый формат файла.", "danger")
-        return redirect(url_for("courses.course_detail", course_id=lesson["course_id"]))
-
     try:
         orig_name, stored_name = _safe_save(file)
     except ValueError:
-        flash("Некорректное имя файла.", "danger")
+        flash("Некорректное имя файла или недопустимый формат.", "danger")
         return redirect(url_for("courses.course_detail", course_id=lesson["course_id"]))
 
     execute(
@@ -151,14 +154,16 @@ def upload_submission_file(task_id):
         flash("Задание не найдено.", "danger")
         return redirect(url_for("courses.course_list"))
 
+    # Сначала проверка доступа, потом все остальные проверки.
+    # Иначе студент может энумерейтить id заданий и узнавать их типы.
+    if not _student_enrolled_for_task(task_id):
+        flash("Нет доступа к этому заданию.", "danger")
+        return redirect(url_for("courses.course_list"))
+
     # Файлы — только для open-заданий
     if task["task_type"] != "open":
         flash("Файлы можно загружать только к заданиям с развёрнутым ответом.", "danger")
         return redirect(url_for("tasks.task_detail", task_id=task_id))
-
-    if not _student_enrolled_for_task(task_id):
-        flash("Нет доступа к этому заданию.", "danger")
-        return redirect(url_for("courses.course_list"))
 
     file = request.files.get("file")
     if not file or not file.filename:
@@ -169,14 +174,10 @@ def upload_submission_file(task_id):
         flash("Имя файла слишком длинное (максимум 255 символов).", "danger")
         return redirect(url_for("tasks.task_detail", task_id=task_id))
 
-    if not _allowed(file.filename):
-        flash("Недопустимый формат файла.", "danger")
-        return redirect(url_for("tasks.task_detail", task_id=task_id))
-
     try:
         _, stored_name = _safe_save(file)
     except ValueError:
-        flash("Некорректное имя файла.", "danger")
+        flash("Некорректное имя файла или недопустимый формат.", "danger")
         return redirect(url_for("tasks.task_detail", task_id=task_id))
 
     execute(

@@ -32,7 +32,7 @@ body.a11y .card-footer {
     border-top: 1px solid #ff0 !important
 }
 
-body.a11y #a11y-toggle, body.a11y .btn-primary, body.a11y .btn-success {
+body.a11y .a11y-toggle, body.a11y .btn-primary, body.a11y .btn-success {
     background-color: #ff0 !important;
     color: #000 !important;
     border-color: #ff0 !important

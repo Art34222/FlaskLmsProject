@@ -15,6 +15,28 @@ def _can_edit_course(course) -> bool:
     return session.get("role") == "teacher" and course["teacher_id"] == session.get("user_id")
 
 
+def _can_view_course(course) -> bool:
+    """
+    Админ — любой курс.
+    Учитель — только свои курсы.
+    Студент — только курсы, на которые записан.
+    """
+    if not course:
+        return False
+    role = session.get("role")
+    user_id = session.get("user_id")
+    if role == "admin":
+        return True
+    if role == "teacher":
+        return course["teacher_id"] == user_id
+    if role == "student":
+        return query_one(
+            "SELECT 1 FROM enrollments WHERE user_id = ? AND course_id = ?",
+            (user_id, course["id"]),
+        ) is not None
+    return False
+
+
 # ── Список курсов ────────────────────────────────────────────────
 
 @courses_bp.route("/")
@@ -90,15 +112,10 @@ def course_detail(course_id):
         flash("Курс не найден.", "danger")
         return redirect(url_for("courses.course_list"))
 
-    # Студент должен быть записан на курс
-    if session.get("role") == "student":
-        enrolled = query_one(
-            "SELECT id FROM enrollments WHERE user_id = ? AND course_id = ?",
-            (session["user_id"], course_id),
-        )
-        if not enrolled:
-            flash("Вы не записаны на этот курс.", "warning")
-            return redirect(url_for("courses.course_list"))
+    # Единая проверка доступа для всех ролей
+    if not _can_view_course(course):
+        flash("Нет доступа к этому курсу.", "danger")
+        return redirect(url_for("courses.course_list"))
 
     lessons = query_all(
         "SELECT * FROM lessons WHERE course_id = ? ORDER BY position",

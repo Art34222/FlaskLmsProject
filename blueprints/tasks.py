@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 
-from database.db import query_one, query_all, execute
+from database.db import query_one, query_all, execute, get_db
 from services.grading_service import auto_check_test
 from utils.decorators import login_required, role_required
 
@@ -114,27 +114,35 @@ def create_task(lesson_id):
         # Для open варианты и correct_options не используем
         pass
 
-    # ── Всё валидно — можно вставлять ───────────────────────────
+    # ── Всё валидно — вставляем task и его options в одной транзакции ─
     max_pos = query_one(
         "SELECT COALESCE(MAX(position), 0) AS mp FROM tasks WHERE lesson_id = ?",
         (lesson_id,),
     )
-    task_id = execute(
-        """INSERT INTO tasks (lesson_id, title, description, task_type,
-                              correct_answer, max_score, position)
-           VALUES (?, ?, ?, ?, ?, ?, ?)""",
-        (lesson_id, title, description, task_type, correct_answer,
-         max_score, (max_pos["mp"] or 0) + 1),
-    )
+    db = get_db()
+    try:
+        cur = db.execute(
+            """INSERT INTO tasks (lesson_id, title, description, task_type,
+                                  correct_answer, max_score, position)
+               VALUES (?, ?, ?, ?, ?, ?, ?)""",
+            (lesson_id, title, description, task_type, correct_answer,
+             max_score, (max_pos["mp"] or 0) + 1),
+        )
+        task_id = cur.lastrowid
 
-    if task_type == "test":
-        for i, label in enumerate(options):
-            label = label.strip()
-            if label:
-                execute(
-                    "INSERT INTO task_options (task_id, label, is_correct) VALUES (?, ?, ?)",
-                    (task_id, label, 1 if str(i) in correct_indices else 0),
-                )
+        if task_type == "test":
+            for i, label in enumerate(options):
+                label = label.strip()
+                if label:
+                    db.execute(
+                        "INSERT INTO task_options (task_id, label, is_correct) VALUES (?, ?, ?)",
+                        (task_id, label, 1 if str(i) in correct_indices else 0),
+                    )
+        db.commit()
+    except Exception:
+        db.rollback()
+        flash("Не удалось создать задание. Попробуйте ещё раз.", "danger")
+        return redirect(url_for("tasks.create_task", lesson_id=lesson_id))
 
     flash("Задание создано!", "success")
     return redirect(url_for("courses.course_detail", course_id=lesson["course_id"]))
@@ -155,16 +163,21 @@ def task_detail(task_id):
         flash("Урок не найден.", "danger")
         return redirect(url_for("courses.course_list"))
 
-    # Проверка доступа
+    # Проверка доступа: запрет по умолчанию, доступ только явно разрешённым ролям.
     role = session.get("role")
-    if role == "student":
-        if not _student_has_access_to_task(task):
-            flash("Нет доступа к этому заданию.", "danger")
-            return redirect(url_for("courses.course_list"))
+    if role == "admin":
+        pass  # админ видит всё
     elif role == "teacher":
         if not _user_can_edit_lesson(lesson):
             flash("Нет доступа к этому заданию.", "danger")
             return redirect(url_for("courses.course_list"))
+    elif role == "student":
+        if not _student_has_access_to_task(task):
+            flash("Нет доступа к этому заданию.", "danger")
+            return redirect(url_for("courses.course_list"))
+    else:
+        flash("Нет доступа к этому заданию.", "danger")
+        return redirect(url_for("courses.course_list"))
 
     options = query_all("SELECT id, task_id, label FROM task_options WHERE task_id = ?", (task_id,))
 
