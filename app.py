@@ -10,7 +10,7 @@ csrf = CSRFProtect()
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-
+    csrf.init_app(app)
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
     # Database lifecycle
@@ -57,7 +57,7 @@ def create_app():
             return redirect(url_for("courses.course_list"))
         return redirect(url_for("auth.login"))
     
-    csrf.init_app(app)
+
     return app
 
 
