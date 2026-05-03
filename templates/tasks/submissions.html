@@ -20,7 +20,7 @@
         <tr>
             <td>{{ s.username }}</td>
             <td>{{ s.task_title }}</td>
-            <td>
+            <td class="text-break-word">
                 {% if s.answer %}
                 {{ s.answer[:100] }}{% if s.answer|length > 100 %}…{% endif %}
                 {% else %}
