@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>{% block title %}EduOnline{% endblock %}</title>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
@@ -38,21 +38,22 @@
                 {% endif %}
             </ul>
             <ul class="navbar-nav align-items-lg-center">
-                <li class="nav-item">
-                    <span class="nav-link text-light">
-                        {{ session.get('username') }} ({{ session.get('role') }})
-                    </span>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-light" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static">
+                        {{ session.get('username') }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2" aria-labelledby="userDropdown" style="border-radius: 12px;">
+                        <li><span class="dropdown-item-text text-muted" style="font-size: 0.85em;">Роль: {{ session.get('role') }}</span></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('auth.setup_2fa') }}">Настройки 2FA</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger fw-medium" href="{{ url_for('auth.logout') }}">Выйти</a></li>
+                    </ul>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('auth.setup_2fa') }}">2FA</a>
-                </li>
-                <li class="nav-item">
+                <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
                     <button class="btn btn-sm btn-outline-light a11y-toggle" type="button">
                         ☰ Для слабовидящих
                     </button>
-                </li>
-                <li class="nav-item ms-lg-2">
-                    <a class="nav-link" href="{{ url_for('auth.logout') }}">Выйти</a>
                 </li>
             </ul>
         </div>

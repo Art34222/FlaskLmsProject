@@ -12,13 +12,23 @@ body.a11y {
     line-height: 1.8 !important
 }
 
+/* Headings Contrast */
+body.a11y h1, body.a11y h2, body.a11y h3, body.a11y h4, body.a11y h5, body.a11y h6 {
+    color: #ff0 !important;
+}
+
 body.a11y .navbar {
     border-bottom: 5px solid #ff0 !important
 }
 
-body.a11y .nav-link, body.a11y .nav-link.text-light, body.a11y .navbar-brand {
+body.a11y .nav-link, body.a11y .nav-link.text-light, body.a11y .dropdown-toggle {
     color: #ff0 !important;
     font-size: 1.3rem !important
+}
+
+body.a11y .navbar-brand {
+    color: #ff0 !important;
+    font-size: 1.5rem !important;
 }
 
 body.a11y .card {
@@ -32,21 +42,33 @@ body.a11y .card-footer {
     border-top: 1px solid #ff0 !important
 }
 
+/* Buttons sizing and contrast */
 body.a11y .a11y-toggle, body.a11y .btn-primary, body.a11y .btn-success {
     background-color: #ff0 !important;
     color: #000 !important;
-    border-color: #ff0 !important
+    border-color: #ff0 !important;
+    font-size: 1.2rem !important;
+    padding: 0.6rem 1.2rem !important;
 }
 
+body.a11y .btn-outline-success, body.a11y .btn-outline-danger, body.a11y .btn-outline-primary {
+    font-size: 1.2rem !important;
+    padding: 0.6rem 1.2rem !important;
+    border-width: 2px !important;
+}
+
+/* Form Inputs sizing */
 body.a11y .form-control, body.a11y .form-select {
     background-color: #1a1a1a !important;
     color: #fff !important;
     border: 2px solid #ff0 !important;
-    font-size: 1.2rem !important
+    font-size: 1.3rem !important;
+    padding: 0.8rem 1rem !important;
 }
 
 body.a11y .form-label {
-    color: #ff0 !important
+    color: #ff0 !important;
+    font-size: 1.3rem !important;
 }
 
 body.a11y .table {
@@ -55,12 +77,14 @@ body.a11y .table {
 
 body.a11y .table-dark th {
     background-color: #333 !important;
-    color: #ff0 !important
+    color: #ff0 !important;
+    font-size: 1.2rem !important;
 }
 
 body.a11y .table tbody tr td {
     background-color: #1a1a1a !important;
-    border-color: #555 !important
+    border-color: #555 !important;
+    font-size: 1.2rem !important;
 }
 
 body.a11y .alert {
@@ -82,4 +106,35 @@ body.a11y .accordion-body {
 
 body.a11y .text-muted {
     color: #ccc !important
+}
+
+/* Dropdown Menu Fixes */
+body.a11y .dropdown-menu {
+    background-color: #1a1a1a !important;
+    border: 2px solid #ff0 !important;
+}
+
+body.a11y .dropdown-item, body.a11y .dropdown-item-text {
+    color: #fff !important;
+    font-size: 1.3rem !important;
+    padding: 0.5rem 1rem !important;
+}
+
+body.a11y .dropdown-item:hover, body.a11y .dropdown-item:focus {
+    background-color: #ff0 !important;
+    color: #000 !important;
+}
+
+body.a11y .dropdown-item.text-danger {
+    color: #ff6b6b !important; /* Brighter red for black bg contrast */
+}
+
+body.a11y .dropdown-item.text-danger:hover, body.a11y .dropdown-item.text-danger:focus {
+    background-color: #ff6b6b !important;
+    color: #000 !important;
+}
+
+body.a11y .dropdown-divider {
+    border-top-color: #ff0 !important;
+    opacity: 1 !important;
 }
