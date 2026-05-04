@@ -49,27 +49,41 @@ def generate_xlsx(course_id: int | None = None) -> bytes:
     return buf.read()
 
 
-def generate_pdf_html(course_id: int | None = None) -> str:
+def generate_pdf(course_id: int | None = None) -> bytes:
     """
-    Возвращает HTML-строку для pdfkit.
-    Если wkhtmltopdf не установлен — используй этот HTML как fallback.
+    Генерирует PDF-документ с помощью fpdf2 и возвращает байты.
     """
+    from fpdf import FPDF
+    import os
+
     df = _leaderboard_df(course_id)
-    table_html = df.to_html(index=False, classes="table", border=0)
-    return f"""
-    <html>
-    <head><meta charset="utf-8">
-    <style>
-        body {{ font-family: Arial, sans-serif; margin: 40px; }}
-        h1 {{ color: #333; }}
-        .table {{ border-collapse: collapse; width: 100%; }}
-        .table th, .table td {{ border: 1px solid #ccc; padding: 8px; text-align: left; }}
-        .table th {{ background: #f5f5f5; }}
-    </style>
-    </head>
-    <body>
-        <h1>Отчёт об успеваемости — EduOnline</h1>
-        {table_html}
-    </body>
-    </html>
-    """
+
+    class PDF(FPDF):
+        def header(self):
+            self.set_font("Roboto", style="B", size=16)
+            self.cell(0, 10, "Отчёт об успеваемости — EduOnline", align="C", new_x="LMARGIN", new_y="NEXT")
+            self.ln(10)
+
+    pdf = PDF()
+    
+    # Добавляем шрифт с поддержкой кириллицы
+    font_path = os.path.join(os.path.dirname(__file__), "..", "static", "fonts", "Roboto-Regular.ttf")
+    pdf.add_font("Roboto", style="", fname=font_path)
+    pdf.add_font("Roboto", style="B", fname=font_path) # Используем тот же файл для жирного (или нужно добавить Roboto-Bold)
+
+    pdf.add_page()
+    pdf.set_font("Roboto", size=12)
+
+    # Заголовок таблицы
+    pdf.set_fill_color(240, 240, 240)
+    for col in df.columns:
+        pdf.cell(60, 10, str(col), border=1, fill=True, align="C")
+    pdf.ln()
+
+    # Данные таблицы
+    for _, row in df.iterrows():
+        for item in row:
+            pdf.cell(60, 10, str(item), border=1, align="C")
+        pdf.ln()
+
+    return pdf.output()

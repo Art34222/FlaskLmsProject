@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, Response, session, flash,
 
 from database.db import query_one, query_all
 from services.grading_service import get_leaderboard
-from services.report_service import generate_csv, generate_xlsx, generate_pdf_html
+from services.report_service import generate_csv, generate_xlsx, generate_pdf
 from utils.decorators import login_required, role_required
 
 stats_bp = Blueprint("stats", __name__)
@@ -130,20 +130,14 @@ def report_xlsx():
 @role_required("teacher", "admin")
 def report_pdf():
     """
-    Генерация PDF. Если wkhtmltopdf установлен — отдаём PDF,
-    иначе — отдаём HTML как fallback.
+    Генерация PDF через fpdf2.
     """
     course_id = request.args.get("course_id", type=int)
     _check_report_access(course_id)
-    html = generate_pdf_html(course_id)
+    pdf_bytes = generate_pdf(course_id)
 
-    try:
-        import pdfkit
-        pdf = pdfkit.from_string(html, False)
-        return Response(
-            pdf,
-            mimetype="application/pdf",
-            headers={"Content-Disposition": "inline; filename=report.pdf"},
-        )
-    except (ImportError, OSError):
-        return Response(html, mimetype="text/html")
+    return Response(
+        pdf_bytes,
+        mimetype="application/pdf",
+        headers={"Content-Disposition": "inline; filename=report.pdf"},
+    )
