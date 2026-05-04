@@ -9,11 +9,11 @@
 
 
 :root {
-    --primary-color: #4f46e5;
-    --primary-hover: #4338ca;
+    --primary-color: #4338ca; /* Darker indigo for better contrast (Indigo-700) */
+    --primary-hover: #3730a3; /* Even darker for hover (Indigo-800) */
     --bg-color: #f8fafc;
     --text-main: #0f172a;
-    --text-muted: #64748b;
+    --text-muted: #475569; /* Darkened from #64748b to meet contrast requirements */
     --card-bg: #ffffff;
     --nav-bg: #1e1b4b; /* Deep rich purple/navy for navbar */
     --border-color: #e2e8f0;
@@ -26,6 +26,17 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Global Links Contrast Fix */
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
 }
 
 /* Navbar */
