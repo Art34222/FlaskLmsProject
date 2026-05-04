@@ -2,7 +2,7 @@
 {% block title %}{{ course.title }} — EduOnline{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>{{ course.title }}</h2>
+    <h2 class="text-break-word">{{ course.title }}</h2>
     <a href="{{ url_for('courses.course_list') }}" class="btn btn-outline-secondary btn-sm">← Назад</a>
 </div>
 

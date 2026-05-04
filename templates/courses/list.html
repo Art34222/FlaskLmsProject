@@ -14,7 +14,7 @@
     <div class="col-md-4 mb-3">
         <div class="card h-100">
             <div class="card-body">
-                <h5 class="card-title">{{ c.title }}</h5>
+                <h5 class="card-title text-break-word">{{ c.title }}</h5>
                 <p class="card-text text-muted text-truncate-multiline">{{ c.description or 'Без описания' }}</p>
             </div>            <div class="card-footer">
                 <a href="{{ url_for('courses.course_detail', course_id=c.id) }}"
@@ -43,7 +43,7 @@
     <div class="col-md-4 mb-3">
         <div class="card h-100">
             <div class="card-body">
-                <h5 class="card-title">{{ c.title }}</h5>
+                <h5 class="card-title text-break-word">{{ c.title }}</h5>
                 <p class="card-text text-muted text-truncate-multiline">{{ c.description or 'Без описания' }}</p>
             </div>            <div class="card-footer">
                 <form method="POST" action="{{ url_for('courses.enroll', course_id=c.id) }}" class="d-inline">

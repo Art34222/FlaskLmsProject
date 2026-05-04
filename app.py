@@ -1,7 +1,6 @@
 import os
 
 from flask import Flask
-from waitress import serve
 from flask_wtf.csrf import CSRFProtect
 from config import Config
 from database.db import init_db, close_db
@@ -59,15 +58,3 @@ def create_app():
     
 
     return app
-
-
-if __name__ == "__main__":
-    application = create_app()
-    serve(
-        application,
-        host="127.0.0.1",
-        port=5000,
-        trusted_proxy="127.0.0.1",
-        trusted_proxy_headers="x-forwarded-for x-forwarded-proto x-forwarded-host",
-        url_scheme="https",
-    )

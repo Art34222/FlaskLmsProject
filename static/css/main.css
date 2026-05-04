@@ -36,7 +36,51 @@ a {
 }
 a:hover {
     color: var(--primary-hover);
-    text-decoration: underline;
+    text-decoration: none;
+}
+
+/* Animated Navbar Toggler */
+.navbar-toggler {
+    padding: 10px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important; /* Красивая окантовка */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px; /* Расстояние между палочками */
+    width: 45px;
+    height: 38px;
+    position: relative;
+    transition: all .3s ease-in-out;
+}
+
+.navbar-toggler .toggler-icon {
+    display: block;
+    height: 3px; /* Делаем палочки жирнее */
+    width: 24px;
+    background: #ffffff;
+    border-radius: 2px;
+    transition: all .25s ease-in-out;
+    position: absolute;
+}
+
+/* Позиционирование палочек в обычном состоянии */
+.navbar-toggler .top-bar { transform: translateY(-8px); }
+.navbar-toggler .middle-bar { opacity: 1; transform: translateX(0); }
+.navbar-toggler .bottom-bar { transform: translateY(8px); }
+
+/* Анимация в состояние "X" */
+.navbar-toggler:not(.collapsed) .top-bar {
+    transform: translateY(0) rotate(45deg);
+}
+
+.navbar-toggler:not(.collapsed) .middle-bar {
+    opacity: 0;
+    transform: translateX(-10px);
+}
+
+.navbar-toggler:not(.collapsed) .bottom-bar {
+    transform: translateY(0) rotate(-45deg);
 }
 
 /* Navbar */
