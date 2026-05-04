@@ -137,7 +137,7 @@ def report_pdf():
     pdf_bytes = generate_pdf(course_id)
 
     return Response(
-        pdf_bytes,
+        bytes(pdf_bytes),
         mimetype="application/pdf",
-        headers={"Content-Disposition": "inline; filename=report.pdf"},
+        headers={"Content-Disposition": 'inline; filename="report.pdf"'},
     )
