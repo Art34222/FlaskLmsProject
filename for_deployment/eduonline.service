@@ -12,7 +12,9 @@ ProtectHome=true
 ProtectSystem=strict
 NoNewPrivileges=true
 PrivateTmp=true
-ExecStart=/opt/eduonline/.venv/bin/gunicorn "app:create_app()" --bind 127.0.0.1:5000 --workers 5 --worker-class gthread --threads 12 --backlog 2048 --timeout 30 --max-requests 10000 --max-requests-jitter 1000 --no-control-socket --keepalive 5
+RuntimeDirectory=eduonline
+RuntimeDirectoryMode=0750
+ExecStart=/opt/eduonline/.venv/bin/gunicorn "app:create_app()" --bind unix:/run/eduonline/eduonline.sock --umask 007 --workers 5 --worker-class gthread --threads 12 --backlog 2048 --timeout 30 --max-requests 10000 --max-requests-jitter 1000 --no-control-socket --keep-alive 5
 Restart=always
 LimitNOFILE=65535
 [Install]
