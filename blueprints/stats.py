@@ -143,7 +143,7 @@ def report_pdf():
         return Response(
             pdf,
             mimetype="application/pdf",
-            headers={"Content-Disposition": "attachment; filename=report.pdf"},
+            headers={"Content-Disposition": "inline; filename=report.pdf"},
         )
     except (ImportError, OSError):
         return Response(html, mimetype="text/html")
