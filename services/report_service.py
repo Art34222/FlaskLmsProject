@@ -65,11 +65,12 @@ def generate_pdf(course_id: int | None = None) -> bytes:
             self.ln(10)
 
     pdf = PDF()
-    
+
     # Добавляем шрифт с поддержкой кириллицы
     font_path = os.path.join(os.path.dirname(__file__), "..", "static", "fonts", "Roboto-Regular.ttf")
     pdf.add_font("Roboto", style="", fname=font_path)
-    pdf.add_font("Roboto", style="B", fname=font_path) # Используем тот же файл для жирного (или нужно добавить Roboto-Bold)
+    pdf.add_font("Roboto", style="B",
+                 fname=font_path)  # Используем тот же файл для жирного (или нужно добавить Roboto-Bold)
 
     pdf.add_page()
     pdf.set_font("Roboto", size=12)

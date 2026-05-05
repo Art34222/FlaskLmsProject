@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash TEXT  NOT NULL,
     role        TEXT    NOT NULL DEFAULT 'student'
                         CHECK (role IN ('student', 'teacher', 'admin')),
-    otp_secret  TEXT,           -- секрет для pyotp (NULL = 2FA не включена)
+    otp_secret  TEXT,
     otp_enabled INTEGER NOT NULL DEFAULT 0,
     created_at  TEXT    NOT NULL DEFAULT (datetime('now'))
 );
