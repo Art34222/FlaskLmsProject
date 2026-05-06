@@ -93,6 +93,8 @@ echo "Запуск Nginx..."
 systemctl start nginx
 systemctl enable nginx
 
+rm -rf /opt/eduonline/for_deployment
+
 echo "====================================================="
 echo "✅ Развертывание успешно завершено!"
 echo "Ваш сайт должен быть доступен по адресу https://$DOMAIN_NAME"
